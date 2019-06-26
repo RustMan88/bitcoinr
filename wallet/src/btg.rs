@@ -119,14 +119,15 @@ pub fn sign_rawtx( tmp :&Transaction,accounts:Vec<Account>) -> Result<String, Er
             Payload::PubkeyHash(_) =>{
                 let pk_script = account.address.script_pubkey();
                 println!("sign_rawtx-> pk_script:{:?}",pk_script);
-                let sign_data = tx.signature_hash(i, &pk_script, SigHashType::Forkid.as_u32()).into_inner();
+                let sighash_type :u32 = SigHashType::All.as_u32()|SigHashType::Forkid.as_u32();
+                let sign_data = tx.signature_hash(i, &pk_script, sighash_type).into_inner();
                 let mut serialized_sig = account.private_key.sign(&Message::from_slice(&sign_data).map_err(|_|Error::AddressParseError)?,&ctx);
 //                let signature = ctx.sign(
 //                    &Message::from_slice(&sign_data).map_err(|_|Error::AddressParseError)?,
 //                    &account.private_key.key,
 //                );
 //                let mut serialized_sig = signature.serialize_der();
-                serialized_sig.push(0x1);
+                serialized_sig.push(sighash_type as u8);
 
                 let script = Builder::new()
                     .push_slice(serialized_sig.as_slice())
