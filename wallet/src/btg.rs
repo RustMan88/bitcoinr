@@ -142,7 +142,6 @@ pub fn sign_rawtx( tmp :&Transaction,accounts:Vec<Account>) -> Result<String, Er
    Ok(consensus::encode::serialize_hex(&tx))
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]
